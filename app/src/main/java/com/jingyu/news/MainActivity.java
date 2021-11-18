@@ -2,18 +2,22 @@ package com.jingyu.news;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.jingyu.news.databinding.ActivityMainBinding;
+import com.jingyu.news.model.Article;
+import com.jingyu.news.model.NewsResponse;
+import com.jingyu.news.network.NewsApi;
+import com.jingyu.news.network.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +44,24 @@ public class MainActivity extends AppCompatActivity {
         navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(navView, navController);
         NavigationUI.setupActionBarWithNavController(this, navController);
+
+        // test the api request
+        NewsApi api = RetrofitClient.newInstance().create(NewsApi.class);
+        api.getTopHeadlines("US").enqueue(new Callback<NewsResponse>() {
+            @Override
+            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                           if (response.isSuccessful()) {
+                                   Log.d("getTopHeadlines", response.body().toString());
+                               } else {
+                                   Log.d("getTopHeadlines", response.toString());
+                               }
+                       }
+            @Override
+            public void onFailure(Call<NewsResponse> call, Throwable t) {
+                           Log.d("getTopHeadlines", t.toString());
+                       }
+        });
+
     }
 
     @Override

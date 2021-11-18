@@ -1,24 +1,23 @@
 package com.jingyu.news.model;
 
+import java.util.List;
 import java.util.Objects;
 
 public class NewsResponse {
-    public String author;
-    public String content;
-    public String description;
-    public String publishedAt;
-    public String title;
+    public Integer totalResults;
+    public List<Article> articles;
+    public String code;
+    public String message;
+    public String status;
 
     @Override
     public String toString() {
-        return "Article{" +
-                "author='" + author + '\'' +
-                ", content='" + content + '\'' +
-                ", description='" + description + '\'' +
-                ", publishedAt='" + publishedAt + '\'' +
-                ", title='" + title + '\'' +
-                ", url='" + url + '\'' +
-                ", urlToImage='" + urlToImage + '\'' +
+        return "NewsResponse{" +
+                "totalResults=" + totalResults +
+                ", articles=" + articles +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 
@@ -26,15 +25,12 @@ public class NewsResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NewsResponse article = (NewsResponse) o;
-        return Objects.equals(author, article.author) && Objects.equals(content, article.content) && Objects.equals(description, article.description) && Objects.equals(publishedAt, article.publishedAt) && Objects.equals(title, article.title) && Objects.equals(url, article.url) && Objects.equals(urlToImage, article.urlToImage);
+        NewsResponse that = (NewsResponse) o;
+        return Objects.equals(totalResults, that.totalResults) && Objects.equals(articles, that.articles) && Objects.equals(code, that.code) && Objects.equals(message, that.message) && Objects.equals(status, that.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, content, description, publishedAt, title, url, urlToImage);
+        return Objects.hash(totalResults, articles, code, message, status);
     }
-
-    public String url;
-    public String urlToImage;
 }
