@@ -2,13 +2,21 @@ package com.jingyu.news.ui.home;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.jingyu.news.R;
+import com.jingyu.news.model.NewsResponse;
+import com.jingyu.news.repository.NewsRepository;
+import com.jingyu.news.repository.NewsViewModelFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +24,30 @@ import com.jingyu.news.R;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HomeFragment";
+
+    private HomeViewModel viewModel;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        subscribeObservers("us");
+    }
+
+    private void subscribeObservers(String country) {
+        NewsRepository repository = new NewsRepository();
+        viewModel = new ViewModelProvider(this, new NewsViewModelFactory(repository)).get(HomeViewModel.class);
+        viewModel.setCountryInput(country);
+        viewModel.getTopHeadlines().observe(getViewLifecycleOwner(), new Observer<NewsResponse>() {
+            @Override
+            public void onChanged(NewsResponse newsResponse) {
+                if (newsResponse != null) {
+                    Log.d(TAG, "onChanged: " + newsResponse.toString());
+                }
+            }
+        });
+
+    }
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

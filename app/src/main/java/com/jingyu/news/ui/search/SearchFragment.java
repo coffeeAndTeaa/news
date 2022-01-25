@@ -2,13 +2,24 @@ package com.jingyu.news.ui.search;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.jingyu.news.R;
+import com.jingyu.news.databinding.FragmentSearchBinding;
+import com.jingyu.news.model.NewsResponse;
+import com.jingyu.news.repository.NewsRepository;
+import com.jingyu.news.repository.NewsViewModelFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +27,11 @@ import com.jingyu.news.R;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment {
+    private static final String TAG = "SearchFragment";
+
+    private SearchViewModel viewModel;
+    private FragmentSearchBinding binding;
+    private SearchNewsAdapter newsAdapter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +41,46 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        newsAdapter = new SearchNewsAdapter();
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 2);
+        binding.newsResultsRecyclerView.setLayoutManager(gridLayoutManager);
+        binding.newsResultsRecyclerView.setAdapter(newsAdapter);
+
+        subscribeObservers();
+        binding.newsSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (!query.isEmpty()) {
+                    viewModel.setSearchInput(query);
+                }
+                binding.newsSearchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    public void subscribeObservers(){
+        NewsRepository repository = new NewsRepository();
+        viewModel = new ViewModelProvider(this, new NewsViewModelFactory(repository)).get(SearchViewModel.class);
+        viewModel.searchNews().observe(getViewLifecycleOwner(), new Observer<NewsResponse>() {
+            @Override
+            public void onChanged(NewsResponse newsResponse) {
+                if (newsResponse != null) {
+                    newsAdapter.setArticles(newsResponse.articles);
+                }
+            }
+        });
+    }
 
     public SearchFragment() {
         // Required empty public constructor
@@ -61,6 +117,7 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false);
+        binding = FragmentSearchBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 }
