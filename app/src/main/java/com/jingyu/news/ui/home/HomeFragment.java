@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.jingyu.news.R;
 import com.jingyu.news.databinding.FragmentHomeBinding;
@@ -65,7 +66,7 @@ public class HomeFragment extends Fragment implements CardStackListener{
     }
 
     private void subscribeObservers(String country) {
-        NewsRepository repository = new NewsRepository();
+        NewsRepository repository = new NewsRepository(getActivity().getApplicationContext());
         viewModel = new ViewModelProvider(this, new NewsViewModelFactory(repository)).get(HomeViewModel.class);
         viewModel.setCountryInput(country);
         viewModel.getTopHeadlines().observe(getViewLifecycleOwner(), new Observer<NewsResponse>() {
@@ -135,9 +136,18 @@ public class HomeFragment extends Fragment implements CardStackListener{
     @Override
     public void onCardSwiped(Direction direction) {
         if (direction == Direction.Left) {
-            Log.d(TAG, "onCardSwiped: " + "unliked" + layoutManager.getTopPosition());
+            Log.d(TAG, "onCardSwiped: unliked" + layoutManager.getTopPosition());
         } else if (direction == Direction.Right){
-            Log.d(TAG, "onCardSwiped: disliked" + layoutManager.getTopPosition());
+            Log.d(TAG, "onCardSwiped: liked" + layoutManager.getTopPosition());
+            Article article = articles.get(layoutManager.getTopPosition() - 1);
+            viewModel.setFavoriteArticleInput(article).observe(this, new Observer<Boolean>() {
+                @Override
+                public void onChanged(Boolean aBoolean) {
+                    if (aBoolean == true) {
+                        Toast.makeText(getContext(), "your news is liked", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 

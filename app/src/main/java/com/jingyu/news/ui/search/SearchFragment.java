@@ -70,7 +70,7 @@ public class SearchFragment extends Fragment {
     }
 
     public void subscribeObservers(){
-        NewsRepository repository = new NewsRepository();
+        NewsRepository repository = new NewsRepository(getActivity().getApplicationContext());
         viewModel = new ViewModelProvider(this, new NewsViewModelFactory(repository)).get(SearchViewModel.class);
         viewModel.searchNews().observe(getViewLifecycleOwner(), new Observer<NewsResponse>() {
             @Override

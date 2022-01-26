@@ -12,11 +12,11 @@ import com.jingyu.news.model.Article;
 public abstract class MyDataBase extends RoomDatabase {
     private static final String DBNAME = "myDatabase";
 
-    private MyDataBase instance;
+    private static MyDataBase instance;
 
     public abstract ArticleDao articleDao();
 
-    public MyDataBase getInstance(final Context context){
+    public static MyDataBase getInstance(final Context context){
         if (instance == null) {
             instance = Room.databaseBuilder(
                    context.getApplicationContext(),
